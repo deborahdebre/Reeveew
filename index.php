@@ -1,2 +1,4 @@
-// this is the landing page
 <?php
+//this is the landing page
+
+
