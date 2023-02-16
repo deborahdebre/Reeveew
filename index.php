@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,12 +6,12 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Fuites</title>
+    <title>Reeveew</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="assets/img/circle1.png" rel="icon">
+    <link href="assets/img/starlogo.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
@@ -35,78 +36,114 @@
     * Author: BootstrapMade.com
     * License: https://bootstrapmade.com/license/
     ======================================================== -->
+    <style>
+        /* styles for images */
+        .images {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 20px;
+            margin-top: 4%;
+        }
+
+        .images img {
+            width: 200px;
+            height: 300px;
+            margin-bottom: 10px;
+        }
+
+        /* styles for image titles */
+        .images h5 {
+            text-align: center;
+            font-family: "Arial Rounded MT Bold";
+            color: #002A70;
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
 
-<main>
-    <div class="container">
+<!-- ======= Header ======= -->
+<header id="header" class="header fixed-top d-flex align-items-center">
 
-        <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+    <div class="d-flex align-items-center justify-content-between">
+        <a href="index.php" class="logo d-flex align-items-center">
+            <img src="assets/img/starlogo.png" alt="">
+            <span class="d-none d-lg-block">Reeveew</span>
+        </a>
+    </div><!-- End Logo -->
 
-                        <div class="d-flex justify-content-center py-4">
-                            <a href="index.html" class="logo d-flex align-items-center w-auto">
-                                <img src="assets/img/circle1.png" alt="">
-                                <span class="d-none d-lg-block">Fuites</span>
-                            </a>
-                        </div><!-- End Logo -->
+    <div class="search-bar">
+        <form class="search-form d-flex align-items-center" method="POST" action="#">
+            <input style="margin-left: 46px;width: 550px" type="text" name="query" placeholder="Search" title="Enter search keyword">
+            <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+        </form>
+    </div><!-- End Search Bar -->
 
-                        <div class="card mb-3">
+    <nav class="header-nav ms-auto">
+        <ul class="d-flex align-items-center">
 
-                            <div class="card-body">
-
-                                <div class="pt-4 pb-2">
-                                    <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
-                                    <p class="text-center small">Enter your username & password to login</p>
-                                </div>
-
-                                <form class="row g-3 needs-validation" action="dashboard.php">
-
-                                    <div class="col-12">
-                                        <label for="yourUsername" class="form-label">Username</label>
-                                        <div class="input-group has-validation">
-                                            <span class="input-group-text" id="inputGroupPrepend">@</span>
-                                            <input type="text" name="username" class="form-control" id="yourUsername" required>
-                                            <div class="invalid-feedback">Please enter your username.</div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label for="yourPassword" class="form-label">Password</label>
-                                        <input type="password" name="password" class="form-control" id="yourPassword" required>
-                                        <div class="invalid-feedback">Please enter your password!</div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
-                                            <label class="form-check-label" for="rememberMe">Remember me</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-12">
-                                        <button class="btn btn-primary w-100" type="submit">Login</button>
-                                    </div>
-                                    <div class="col-12">
-                                        <p class="small mb-0">Don't have account? <a href="pages-register.html">Create an account</a></p>
-                                    </div>
-                                </form>
-
-                            </div>
-                        </div>
+            <li class="nav-item d-block d-lg-none">
+                <a class="nav-link nav-icon search-bar-toggle " href="#">
+                    <i class="bi bi-search"></i>
+                </a>
+            </li><!-- End Search Icon-->
 
 
+            <li class="nav-item dropdown pe-3">
 
-                    </div>
-                </div>
-            </div>
+                <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <span class="d-none d-md-block dropdown-toggle ps-2">Hi there</span>
+                </a><!-- End Profile Image Icon -->
 
-        </section>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                    <li class="dropdown-header">
+                        <span>What do you want to do?</span>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
 
-    </div>
-</main><!-- End #main -->
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="login_page.php">
+                            <i class="bi bi-person"></i>
+                            <span>Login</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="user_request.php">
+                            <i class="bi bi-buildings"></i>
+                            <span>Add Business</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center" href="contact_us_page.php">
+                            <i class="bi bi-question-circle"></i>
+                            <span>Contact Us</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+
+                </ul><!-- End Profile Dropdown Items -->
+            </li><!-- End Profile Nav -->
+
+        </ul>
+    </nav><!-- End Icons Navigation -->
+
+</header><!-- End Header -->
+
 
 <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -123,7 +160,44 @@
 <!-- Template Main JS File -->
 <script src="assets/js/main.js"></script>
 
+<h4 style="margin-top: 12%;text-align: center;font-family: Arial Rounded MT Bold;color: #002A70;">Categories</h4>
+<div class="images">
+
+    <!-- first image -->
+    <a href="#">
+        <img src="assets/img/spa.png" alt="Image 3">
+        <h5>Spas</h5>
+    </a>
+
+    <!-- second image -->
+    <a href="#">
+        <img src="assets/img/hotels.png" alt="Image 2">
+        <h5>Hotels</h5>
+    </a>
+
+    <!-- third image -->
+    <a href="#">
+        <img src="assets/img/events.jpg" alt="Image 1">
+        <h5>Events</h5>
+    </a>
+
+
+    <!-- fourth image -->
+    <a href="#">
+        <img src="assets/img/restaurant.png" alt="Image 4">
+        <h5>Restaurants</h5>
+    </a>
+
+    <!-- fifth image -->
+    <a href="#">
+        <img src="assets/img/salon.jpg" alt="Image 5">
+        <h5>Salons</h5>
+    </a>
+
+</div>
 </body>
 
 </html>
 <?php
+//this is the landing page?>
+
