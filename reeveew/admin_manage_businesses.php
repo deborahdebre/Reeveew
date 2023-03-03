@@ -24,8 +24,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve all submitted business requests from the database
-$sql = "SELECT * FROM user_request WHERE status_id=1";
+// Retrieve all businesses from the database
+$sql = "SELECT * FROM business_details";
 $result = mysqli_query($conn, $sql);
 
 
@@ -131,6 +131,7 @@ $result = mysqli_query($conn, $sql);
                         <a class="dropdown-item d-flex align-items-center" href="admin_manage_businesses.php">
                             <i class="bi bi-buildings"></i>
                             <span>Manage Businesses</span>
+
                         </a>
                     </li>
                     <li>
@@ -188,13 +189,30 @@ $result = mysqli_query($conn, $sql);
 <!-- Template Main JS File -->
 <script src="../assets/js/main.js"></script>
 
-
+<script>
+    function deleteBusiness(business_id) {
+        // send a request to update the request status
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "delete_business.php");
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                console.log(this.responseText);
+                // reload the page to see the updated requests
+                window.location.reload();
+            }
+        }
+        xhr.send("business_id=" + business_id);
+    }
+</script>
 <div style="margin-top: 4%;" class="card">
     <div class="card-body">
-        <div style="margin-top: 3%;text-align: center;margin-bottom: 3%" class="pagetitle">
-            <h1>Manage Businesses</h1>
-        </div><!-- End Page Title -->
+        <div style="margin-top: 3%;text-align: center;margin-bottom: 3%; display: flex;" class="pagetitle">
+            <h1 style="margin-left: 42%;text-align: center">Manage Businesses</h1>
+            <a href="admin_add_business_form.php"><i style="color: darkgreen; margin-left: 200%" class="bi bi-plus-square"></i></a>
+        </div>
 
+        <!-- End Page Title -->
         <!-- Table with hoverable rows -->
         <table  class="table table-hover">
             <thead>
@@ -206,101 +224,54 @@ $result = mysqli_query($conn, $sql);
                 <th scope="col">Location</th>
                 <th scope="col">Phone Number</th>
                 <th scope="col">Working Times</th>
+                <th scope="col">Edit</th>
                 <th scope="col">Delete</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">4</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">5</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">6</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">7</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">8</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
-            <tr>
-                <th scope="row">9</th>
-                <td>Starbites</td>
-                <td>Restaurant</td>
-                <td>starbites@gmail.com</td>
-                <td>Accra central</td>
-                <td>+233 455 767 345</td>
-                <td>Everyday 24 hours</td>
-                <td><button style='margin-left: 12%' type='button' class='btn btn-danger' ><i class='bi bi-trash'></i></button></td>
-            </tr>
+            <?php
+            if (!(mysqli_num_rows($result) > 0)) {
+                echo "<p style='text-align: center;color: red'>There are currently no businesses in the system</p>";
+            }
+            $counter=1;
+            while($row = mysqli_fetch_assoc($result)) {
+                if($row['category_id']==1){
+                    $category = "Hotel";
+                }
+                elseif ($row['category_id']==2){
+                    $category = "Restaurant";
+                }
+                elseif ($row['category_id']==3){
+                    $category = "Salon";
+                }
+                elseif ($row['category_id']==4){
+                    $category = "Spa";
+                }
+                elseif ($row['category_id']==5){
+                    $category = "Event";
+                }
+                $business_id = $row['business_id'];
+                $business_name = $row['business_name'];
+                $work_times = $row['working_time'];
+                $business_email = $row['business_email'];
+                $keywords = $row['keywords'];
+                $location = $row['location'];
+                $phone_num = $row['phone_num'];
 
+                echo "<tr>";
+                echo "<td>".$counter."</td>";
+                echo "<td>".$business_name."</td>";
+                echo "<td>".$category."</td>";
+                echo "<td>".$business_email."</td>";
+                echo "<td>".$location."</td>";
+                echo "<td>".$phone_num."</td>";
+                echo "<td>".$work_times."</td>";
+                echo "<td><a href='edit_business.php?business_id=".$business_id."'><i class='bi bi-pencil'></i></a></td>";
+                echo "<td><button style='background: none;border: none' type='button' onclick=\"deleteBusiness($business_id)\"><i style='color: red' class='bi bi-trash'></i></button></td>";
+                echo "</tr>";
+                $counter = $counter + 1;
+            }
+            ?>
             </tbody>
         </table>
         <!-- End Table with hoverable rows -->

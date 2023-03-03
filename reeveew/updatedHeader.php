@@ -9,6 +9,29 @@ if(!(isset($_SESSION['user_id']))){
 else{
     $user_name = $_SESSION["user_name"];
     $nav_state = "Logout";
+
+    // Connect to the database
+    $servername = "localhost";
+    $username = "root";
+    $password = "password";
+    $dbname = "reeveew";
+    // Create a connection
+    $conn = mysqli_connect($servername, $username, $password, $dbname);
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+    $sql = "SELECT user_email FROM user_info WHERE user_id='$user_id'";
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        $u_email = $row['user_email'];
+    }
+    // Get image path
+    $sql = "SELECT image_path FROM Image WHERE user_email='$u_email'";
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $image_path = $row['image_path'];
     $state =1;
 }
 
@@ -85,6 +108,7 @@ else{
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <img src="<?php echo $image_path?>" alt="" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">Hi <?php echo $user_name?></span>
                 </a><!-- End Profile Image Icon -->
 

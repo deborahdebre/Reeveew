@@ -1,18 +1,104 @@
-
 <?php
-session_start();
-if(!(isset($_SESSION['user_id']))){
+
+$servername = "localhost";
+$username = "root";
+$password = "password";
+$dbname = "reeveew";
+$conn = null;
+// Set default values for user session
+if (!isset($_SESSION['user_id'])) {
     $user_name = "there";
     $nav_state = "Login";
-    $state =0;
-}
-else{
+    $state = 0;
+} else {
     $user_name = $_SESSION["user_name"];
     $nav_state = "Logout";
-    $state =1;
+    $state = 1;
 }
 
+function openConnection() {
+    global $servername, $username, $password, $dbname, $conn;
+
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+}
+
+function closeConnection() {
+    global $conn;
+
+    if ($conn != null) {
+        mysqli_close($conn);
+        $conn = null;
+    }
+}
+
+function getAllBusinesses() {
+    global $conn;
+
+    if ($conn == null) {
+        openConnection();
+    }
+
+$sql = "SELECT bd.business_name, bd.business_id, bd.category_id, bd.description, bd.location, bd.phone_num, bd.working_time, bd.keywords, bd.average_price, bd.average_rating, 
+(SELECT i.image_path FROM Image i WHERE i.business_id = bd.business_id ORDER BY i.image_id LIMIT 1) AS image_path, c.category_name, l.location
+FROM business_details bd
+JOIN category c ON bd.category_id = c.category_id
+JOIN location_details l ON bd.location_id = l.location_id
+WHERE EXISTS(SELECT 1 FROM Image WHERE business_id = bd.business_id);";
+
+
+    $result = mysqli_query($conn, $sql);
+    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    return $data;
+}
+
+function getAllLocations() {
+    global $conn;
+
+    if ($conn == null) {
+        openConnection();
+    }
+
+    $sql = "SELECT * FROM location_details";
+    $result = mysqli_query($conn, $sql);
+    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    return $data;
+}
+
+function getAllCategories() {
+    global $conn;
+
+    if ($conn == null) {
+        openConnection();
+    }
+
+    $sql = "SELECT * FROM category";
+    $result = mysqli_query($conn, $sql);
+    $data = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    return $data;
+}
+// Retrieve all submitted business requests from the database
+$dataLoc = getAllLocations();
+$dataCat = getAllCategories();
+// if ($_SESSION['filter']==1) {
+//     $businesses = $_SESSION['filteredBusinesses'];
+// }
+// else{
+    $businesses = getAllBusinesses();
+// }
+
+
+//// Close the database connection
+closeConnection();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -90,13 +176,18 @@ else{
     .ui-slider-range {
         background: #012970;
     }
+    .business-card-image {
+        height: 205px;
+        width: 205px;
+    }
+
 </style>
-<body>
+
 <header id="header" class="header fixed-top d-flex align-items-center">
 
     <div class="d-flex align-items-center justify-content-between">
         <a href="index.php" class="logo d-flex align-items-center">
-            <img src="assets/img/starlogo.png" alt="">
+            <img src="../assets/img/starlogo.png" alt="">
             <span class="d-none d-lg-block">Reeveew</span>
         </a>
     </div><!-- End Logo -->
@@ -172,44 +263,27 @@ else{
 
 
 <aside id="sidebar" class="sidebar">
+
     <div class="sidebar-header">
         <h5 class="card-title" >FILTER</h5>
     </div>
     <hr>
     <div class="sidebar-body">
         <h5 class="card-title">Location</h5>
+        <div id="locationTemp"></div>
         <form>
+        <?php foreach ($dataLoc as $option) { ?>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="location-option1">
-                <label class="form-check-label" for="location-option1">
-                    East Legon
-                </label>
+                <input class="form-check-input" type="checkbox" value="<?php echo $option['location_id']; ?>" id="location-option<?php echo $option['location_id']; ?>">
+                <label class="form-check-label" for="location-option<?php echo $option['location_id']; ?>"><?php echo $option['location']; ?></label>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="location-option2">
-                <label class="form-check-label" for="location-option2">
-                     Kwabenya
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="location-option3">
-                <label class="form-check-label" for="location-option3">
-                    Adenta
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="location-option4">
-                <label class="form-check-label" for="location-option4">
-                    Labone
-                </label>
-            </div>
-            <!-- Add more location options as needed -->
+        <?php } ?>
         </form>
         <hr>
         <h5 class="card-title">Rating</h5>
         <form>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="rating-option1">
+                <input class="form-check-input" type="checkbox" value="4.5" id="rating-option1">
                 <label class="form-check-label" for="rating-option1">
                     <span class="bi bi-star-fill" style="color: rgb(210, 157, 0)"></span>
                     <span class="bi bi-star-fill" style="color: rgb(210, 157, 0)"></span>
@@ -220,7 +294,7 @@ else{
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="rating-option2">
+                <input class="form-check-input" type="checkbox" value="2.5" id="rating-option2">
                 <label class="form-check-label" for="rating-option2">
                     <span class="bi bi-star-fill" style="color: rgb(210, 157, 0)"></span>
                     <span class="bi bi-star-fill" style="color: rgb(210, 157, 0)"></span>
@@ -230,7 +304,7 @@ else{
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="rating-option3">
+                <input class="form-check-input" type="checkbox" value="1.5" id="rating-option3">
                 <label class="form-check-label" for="rating-option3">
                     <span class="bi bi-star-fill" style="color: rgb(210, 157, 0)"></span>
                     <span class="bi bi-star-half" style="color: rgb(210, 157, 0)"></span>
@@ -240,7 +314,7 @@ else{
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="rating-option4">
+                <input class="form-check-input" type="checkbox" value="1" id="rating-option4">
                 <label class="form-check-label" for="rating-option4">
                     <span class="bi bi-star-fill" style="color: rgb(210, 157, 0)"></span>
                     <span class="bi bi-star" style="color: rgb(210, 157, 0)"></span>
@@ -255,36 +329,12 @@ else{
         <hr>
         <h5 class="card-title">Category</h5>
         <form>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="category-1" name="hotel">
-                <label class="form-check-label" for="category-1">
-                    Hotel
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="category-2" name="restaurant">
-                <label class="form-check-label" for="category-2">
-                    Restaurant
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="category-3"name="salon">
-                <label class="form-check-label" for="category-3">
-                    Salon
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="category-4" name="spa">
-                <label class="form-check-label" for="category-4">
-                    Spa
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="category-5" name="event">
-                <label class="form-check-label" for="category-5">
-                    Event
-                </label>
-            </div>
+            <?php foreach ($dataCat as $option) { ?>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="<?php echo $option['category_id']; ?>" id="category-option<?php echo $option['category_id']; ?>">
+                    <label class="form-check-label" for="category-option<?php echo $option['category_id']; ?>"><?php echo $option['category_name']; ?></label>
+                </div>
+            <?php } ?>
         </form>
         <hr>
         <h5 class="card-title">Price (GH¢)</h5>
@@ -296,145 +346,66 @@ else{
             <div id="slider-range"></div>
         </div>
     </form>
+        <div style="text-align: center;width: 100%">
+            <button id="filter-button" type="button" class="btn btn-primary">Filter</button>
+            <button id="clear-button" type="button" class="btn btn-secondary">Clear</button>
+        </div>
+        <div id="FilterStatus"></div>
     </div>
 </aside>
 
-<section class="section" style="padding-left: 30%; padding-top: 7%">
-    <div class="row align-items-top">
-        <div class="col-lg-10">
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="row g-1">
-                            <div class="col-6">
-                                <img src="../assets/img/starbites.jpeg" class="img-fluid rounded-start" alt="..."style="height: 85%;margin: 7.5% 7.5%;">                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="padding-bottom: 0px"><a href="business_details.php">Starbites</a></h5>
-                                    <span class="text-warning">
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill"style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-half"style="color:darkgoldenrod"></i>
-                                     </span><strong>90</strong>
-                                    <p class="card-text">Cozy, family-oriented restaurant with good scenery and excellent food and music.</p>
-                                </div>
-                            </div>
+<section class="section" style="padding-left: 22.5%; padding-top: 7%">
+    <div class="row">
+        <?php
+        foreach ($businesses as $key => $business) {
+            if ($key % 2 == 0) {
+                // Create a new row after every second business card
+                echo '</div><div class="row">';
+            }
+            ?>
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="row g-0">
+                        <div class="col-md-4">
+                            <img src="<?php echo $business['image_path']; ?>" class="img-fluid rounded-start business-card-image" alt="...">
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="row g-1">
-                            <div class="col-6">
-                                <img src="../assets/img/starbites.jpeg" class="img-fluid rounded-start" alt="..."style="height: 85%;margin: 7.5% 7.5%;">                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="padding-bottom: 0px"><a href="business_details.php">Starbites</a></h5>
-                                    <span class="text-warning">
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill"style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-half"style="color:darkgoldenrod"></i>
-                                     </span><strong>90</strong>
-                                    <p class="card-text">Cozy, family-oriented restaurant with good scenery and excellent food and music.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="row g-1">
-                            <div class="col-6">
-                                <img src="../assets/img/starbites.jpeg" class="img-fluid rounded-start" alt="..."style="height: 85%;margin: 7.5% 7.5%;">                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="padding-bottom: 0px"><a href="business_details.php">Starbites</a></h5>
-                                    <span class="text-warning">
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill"style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-half"style="color:darkgoldenrod"></i>
-                                     </span><strong>90</strong>
-                                    <p class="card-text">Cozy, family-oriented restaurant with good scenery and excellent food and music.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="row g-1">
-                            <div class="col-6">
-                                <img src="../assets/img/starbites.jpeg" class="img-fluid rounded-start" alt="..."style="height: 85%;margin: 7.5% 7.5%;">                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="padding-bottom: 0px"><a href="business_details.php">Starbites</a></h5>
-                                    <span class="text-warning">
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill"style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-half"style="color:darkgoldenrod"></i>
-                                     </span><strong>90</strong>
-                                    <p class="card-text">Cozy, family-oriented restaurant with good scenery and excellent food and music.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="row g-1">
-                            <div class="col-6">
-                                <img src="../assets/img/starbites.jpeg" class="img-fluid rounded-start" alt="..."style="height: 85%;margin: 7.5% 7.5%;">                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="padding-bottom: 0px"><a href="business_details.php">Starbites</a></h5>
-                                    <span class="text-warning">
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill"style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-half"style="color:darkgoldenrod"></i>
-                                     </span><strong>90</strong>
-                                    <p class="card-text">Cozy, family-oriented restaurant with good scenery and excellent food and music.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="row g-1">
-                            <div class="col-6">
-                                <img src="../assets/img/starbites.jpeg" class="img-fluid rounded-start" alt="..."style="height: 85%;margin: 7.5% 7.5%;">                            </div>
-                            <div class="col-md-6">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="padding-bottom: 0px"><a href="business_details.php">Starbites</a></h5>
-                                    <span class="text-warning">
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill" style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-fill"style="color:darkgoldenrod"></i>
-                                        <i class="bi bi-star-half"style="color:darkgoldenrod"></i>
-                                     </span><strong>90</strong>
-                                    <p class="card-text">Cozy, family-oriented restaurant with good scenery and excellent food and music.</p>
-                                </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title" style="padding-bottom: 2px"><a href="business_details.php?business_id=<?php echo $business['business_id']; ?>"><?php echo $business['business_name']; ?></a></h5>
+                                <?php
+                                $average_rating = $business['average_rating'];
+                                $rounded_rating = round($average_rating, 1);
+                                $whole_stars = floor($rounded_rating);
+                                $decimal_part = $rounded_rating - $whole_stars;
+                                for ($i = 0; $i < $whole_stars; $i++) {
+                                    echo '<i class="bi bi-star-fill" style="color:darkgoldenrod"></i>';
+                                }
+                                if ($decimal_part > 0) {
+                                    echo '<i class="bi bi-star-half" style="color:darkgoldenrod"></i>';
+                                }
+                                for ($i = 0; $i < 5 - ceil($average_rating); $i++) {
+                                    echo '<i class="bi bi-star" style="color:darkgoldenrod"></i>';
+                                }
+                                ?>
+                                <span><strong><?php echo $rounded_rating; ?></strong></span>
+                                <p class="card-text"><?php echo substr($business['description'], 0, 100); ?>...</p>
+                                <h8 class="card-title"><?php echo $business['location'] ; ?><span><?php echo "  -  ". $business['category_name']; ?></span></h8>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-        </div>
+        <?php } ?>
     </div>
+
+
 </section>
 <script>
+    w3.includeHTML();
+</script>
+<script>
+    var minVal=0;
+    var maxVal=500;
     $( function() {
         $( "#slider-range" ).slider({
             range: true,
@@ -443,6 +414,8 @@ else{
             values: [ 100, 500 ],
             slide: function( event, ui ) {
                 $( "#price-range" ).val( "GH¢" + ui.values[ 0 ] + " - GH¢" + ui.values[ 1 ] );
+                minVal = ui.values[0];
+                maxVal = ui.values[1];
             }
         });
         $( "#price-range" ).val( "GH¢" + $( "#slider-range" ).slider( "values", 0 ) +
@@ -450,9 +423,63 @@ else{
     } );
 </script>
 <script>
-    w3.includeHTML();
-</script>
+    //     document.getElementById("filter-button").addEventListener("click", function() {
+    //     var selectedLocations = [];
+    //     var locationOptions = document.querySelectorAll("#sidebar input[type=checkbox][id^='location-option']");
+    //     for (var i = 0; i < locationOptions.length; i++) {
+    //         if (locationOptions[i].checked) {
+    //             selectedLocations.push(locationOptions[i].value);
+    //         }
+    //     }
 
+    //     var selectedRatings = [];
+    //     var ratingOptions = document.querySelectorAll("#sidebar input[type=checkbox][id^='rating-option']");
+    //     for (var i = 0; i < ratingOptions.length; i++) {
+    //         if (ratingOptions[i].checked) {
+    //             selectedRatings.push(ratingOptions[i].value);
+    //         }
+    //     }
+
+    //     var selectedCategories = [];
+    //     var categoryOptions = document.querySelectorAll("#sidebar input[type=checkbox][id^='category-option']");
+    //     for (var i = 0; i < categoryOptions.length; i++) {
+    //         if (categoryOptions[i].checked) {
+    //             selectedCategories.push(categoryOptions[i].value);
+    //         }
+    //     }
+
+
+    //     const queryString = `location=${selectedLocations.join(',')}&rating=${selectedRatings.join(',')}&category=${selectedCategories.join(',')}&price_min=${minVal}&price_max=${maxVal}`;
+    //     const xhr = new XMLHttpRequest();
+    //     xhr.onreadystatechange = function() {
+    //         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+    //             document.getElementById("FilterStatus").innerHTML= "filtered";
+    //         }
+    //     };
+    //         xhr.open("POST", "filter.php", true);
+    //         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    //         xhr.send(queryString);
+
+    // });
+    //     document.getElementById("clear-button").addEventListener("click", function() {
+    //         // Reset the slider values
+    //         $( "#slider-range" ).slider({
+    //             values: [ 100, 500 ]
+    //         });
+    //         $( "#price-range" ).val( "GH¢" + $( "#slider-range" ).slider( "values", 0 ) +
+    //             " - GH¢" + $( "#slider-range" ).slider( "values", 1 ) );
+
+    //         // Uncheck all checkboxes
+    //         var checkboxes = document.querySelectorAll("input[type=checkbox]");
+    //         for (var i = 0; i < checkboxes.length; i++) {
+    //             checkboxes[i].checked = false;
+    //         }
+    //         <?php
+    //             unset($_SESSION["filter"]);
+    //             header("Location: all_businesses.php");
+    //         ?>
+    //     });
+</script>
 <script>
     function isLogged(){
         <?php if($state==1): ?>
@@ -460,7 +487,6 @@ else{
         <?php else: ?>
         window.location.href = "login_page.php";
         <?php endif; ?>
-
     }
 </script>
                 <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>

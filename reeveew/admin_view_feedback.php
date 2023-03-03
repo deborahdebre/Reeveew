@@ -80,16 +80,11 @@ mysqli_close($conn);
         </a>
     </div><!-- End Logo -->
 
+    <input style="width: 600px;margin-left: 3%;padding-left: 20px" type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search...">
 
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
-            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search...">
 
-            <li class="nav-item d-block d-lg-none">
-                <a class="nav-link nav-icon search-bar-toggle " href="#">
-                    <i class="bi bi-search"></i>
-                </a>
-            </li><!-- End Search Icon-->
 
 
             <li class="nav-item dropdown pe-3">

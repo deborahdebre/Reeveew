@@ -50,6 +50,23 @@ elseif ($category_id==5){
 }
 $request_id = $row['request_id'];
 
+// Get image path
+$sql = "SELECT * FROM Image WHERE business_email='$business_email'";
+$result = mysqli_query($conn, $sql);
+
+// create an empty array to hold the image paths
+$imagePaths = array();
+// loop through the query result and append each image path to the array
+while ($row = mysqli_fetch_assoc($result)) {
+    $imagePaths[] = $row['image_path'];
+}
+
+// access each image path by index
+$image1 = $imagePaths[0];
+$image2 = $imagePaths[1];
+$image3 = $imagePaths[2];
+
+
 ?>
 
     <!DOCTYPE html>
@@ -234,19 +251,19 @@ $request_id = $row['request_id'];
         <h1>Manage Request for <?php echo $business_name; ?></h1>
     </div><!-- End Page Title -->
 
-    <section style="margin-left: 5%" class="section profile">
+    <section style="margin-left: 12%" class="section profile">
         <div class="row">
 
-            <div class="col-xl-3">
+            <div style=" height: 150px;width: 200px; margin-right: 2%" class="col-xl-3">
 
-                <div class="card">
-                    <img src="../assets/img/starbites.jpeg" alt="Profile">
+                <div  class="card">
+                    <img style=" height: 150px; width: 200px;" src="<?php echo $image1?>" alt="">
                 </div>
                 <div class="card">
-                    <img src="../assets/img/starbites1.jpeg" alt="Profile">
+                    <img style=" height: 150px; width: 200px;" src="<?php echo $image2?>" alt="">
                 </div>
                 <div class="card">
-                    <img src="../assets/img/starbites2.jpeg" alt="Profile">
+                    <img style=" height: 150px; width: 200px;" src="<?php echo $image3?>" alt="">
                 </div>
 
             </div>
@@ -266,10 +283,10 @@ $request_id = $row['request_id'];
                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Request</button>
                             </li>
                             <li class="nav-item">
-                                <button style="margin-left: 500%" class="btn btn-success" onclick="processRequest(<?php echo $request_id; ?>,1)">Accept</button>
+                                <button style="margin-left: 400%" class="btn btn-success" onclick="processRequest(<?php echo $request_id; ?>,1)">Accept</button>
                             </li>
                             <li class="nav-item">
-                                <button style="margin-left: 620%" class="btn btn-danger" onclick="processRequest(<?php echo $request_id; ?>,0)">Deny</button>
+                                <button style="margin-left: 520%" class="btn btn-danger" onclick="processRequest(<?php echo $request_id; ?>,0)">Deny</button>
                             </li>
 
                         </ul>
@@ -326,14 +343,14 @@ $request_id = $row['request_id'];
                                     <div class="row mb-3">
                                         <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Business Name</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="businessName" type="text" class="form-control" id="businessName" value=" <?php echo $business_name; ?>">
+                                            <input name="businessName" type="text" class="form-control" id="businessName" value="<?php echo $business_name; ?>">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="about" class="col-md-4 col-lg-3 col-form-label">Business description</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <textarea name="description" class="form-control" id="about" style="height: 100px"> <?php echo $description; ?></textarea>
+                                            <textarea name="description" class="form-control" id="about" style="height: 100px"><?php echo $description; ?></textarea>
                                         </div>
                                     </div>
 
@@ -353,35 +370,35 @@ $request_id = $row['request_id'];
                                     <div class="row mb-3">
                                         <label for="Job" class="col-md-4 col-lg-3 col-form-label">Location</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="location" type="text" class="form-control" id="location" value=" <?php echo $location; ?>">
+                                            <input name="location" type="text" class="form-control" id="location" value="<?php echo $location; ?>">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="Country" class="col-md-4 col-lg-3 col-form-label">Phone</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="phone" type="text" class="form-control" id="phone" value=" <?php echo $phone_num; ?>">
+                                            <input name="phone" type="text" class="form-control" id="phone" value="<?php echo $phone_num; ?>">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="Address" class="col-md-4 col-lg-3 col-form-label">Email</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="mail" type="text" class="form-control" id="mail" value=" <?php echo $business_email; ?>">
+                                            <input name="mail" type="text" class="form-control" id="mail" value="<?php echo $business_email; ?>">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Open/Close</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="opcl" type="text" class="form-control" id="opcl" value=" <?php echo $work_time; ?>">
+                                            <input name="opcl" type="text" class="form-control" id="opcl" value="<?php echo $work_time; ?>">
                                         </div>
                                     </div>
 
                                     <div class="row mb-3">
                                         <label for="Email" class="col-md-4 col-lg-3 col-form-label">Keywords</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="keywords" type="text" class="form-control" id="keywords" value=" <?php echo $keywords; ?>">
+                                            <input name="keywords" type="text" class="form-control" id="keywords" value="<?php echo $keywords; ?>">
                                         </div>
                                     </div>
 

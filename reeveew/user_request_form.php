@@ -10,6 +10,30 @@ if(!(isset($_SESSION['user_id']))){
 else{
     $user_name = $_SESSION["user_name"];
     $nav_state = "Logout";
+
+    // Connect to the database
+    $servername = "localhost";
+    $username = "root";
+    $password = "password";
+    $dbname = "reeveew";
+    // Create a connection
+    $conn = mysqli_connect($servername, $username, $password, $dbname);
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+    $user_id = $_SESSION['user_id'];
+    $sql = "SELECT user_email FROM user_info WHERE user_id='$user_id'";
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        $u_email = $row['user_email'];
+    }
+    // Get image path
+    $sql = "SELECT image_path FROM Image WHERE user_email='$u_email'";
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $image_path = $row['image_path'];
     $state = 1;
 }
 ?>
@@ -110,6 +134,7 @@ else{
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <img src="<?php echo $image_path?>" alt="" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">Hi <?php echo $user_name?></span>
                 </a><!-- End Profile Image Icon -->
 
@@ -179,8 +204,9 @@ else{
         <div class="card-body">
             <h5 style="text-align: center" class="card-title">Request to Add Business</h5>
             <!-- Multi Columns Form -->
-            <form class="row g-3" action="add_business.php" method="post">
+            <form class="row g-3" action="add_business.php" method="post" enctype="multipart/form-data">
                 <div class="col-md-6">
+                    <input type="hidden" name="user_id" value="<?php echo $user_id?>">
                     <label for="businessName" class="form-label">Business Name</label>
                     <input type="text" class="form-control" name="businessName" id="businessName" required>
                 </div>
@@ -210,16 +236,33 @@ else{
                     <label for="working_time" class="form-label">Working time</label>
                     <input type="text" class="form-control" name="working_time" id="working_time" required>
                 </div>
-                <div class="col-12">
-                    <label for="description" class="form-label">Business Description</label>
-                    <input type="text" class="form-control" id="description" name="description" required>
-                </div>
-                <div class="col-12">
+                <div class="col-md-6">
                     <label for="keywords" class="form-label">Keywords</label>
                     <input type="text" class="form-control" id="keywords" name="keywords" required>
                 </div>
 
+                <div class="col-md-6">
+                    <label for="location_id" class="form-label" style="text-align: center">City</label>
+                    <select id="location_id" name="location_id" class="form-select" required>
+                            <option value="1">Accra</option>
+                        <option value="2">Kwabenya</option>
+                        <option value="3">East Legon</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label for="description" class="form-label">Business Description</label>
+                    <input type="text" class="form-control" id="description" name="description" required>
+                </div>
+
+
+                <div class="col-12">
+                <label for="business_pic" style="margin-right: 3%">Upload 3 Photos of Business:</label>
+                <input type="file" id="business_pic" name="business_pic[]" multiple>
+                </div>
+
                 <div class="text-center">
+                    <br>
                     <button type="submit" name="submit" class="btn btn-primary">Submit</button>
                     <button type="reset" class="btn btn-secondary">Reset</button>
                 </div>

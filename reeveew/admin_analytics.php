@@ -58,7 +58,69 @@ $approved_requests = mysqli_num_rows($result6);
 $result7 = mysqli_query($conn, $sql8);
 $denied_requests = mysqli_num_rows($result7);
 
-// Close the connection
+$sql9="SELECT user_feedback.feedback, user_info.user_lname,user_info.user_fname,user_info.user_email
+FROM user_feedback
+INNER JOIN user_info ON user_feedback.user_id = user_info.user_id";
+
+$result9 = mysqli_query($conn, $sql9);
+
+$allFeedback = mysqli_fetch_all($result9, MYSQLI_ASSOC);
+
+
+$sql = "SELECT COUNT(*) AS num_hotels FROM business_details WHERE category_id = 1";
+$result = mysqli_query($conn, $sql);
+
+// Get the count from the result set
+$row = mysqli_fetch_assoc($result);
+$num_hotels = $row['num_hotels'];
+// Get count for restaurants
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE category_id = 2";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$num_restaurants = $row['count'];
+
+// Get count for salons
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE category_id = 3";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$num_salons = $row['count'];
+
+// Get count for spas
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE category_id = 4";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$num_spas = $row['count'];
+
+// Get count for events
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE category_id = 5";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$num_events= $row['count'];
+
+$dataCategories = array($num_hotels, $num_restaurants, $num_salons, $num_spas, $num_events);
+$data_json = json_encode($dataCategories);
+
+// Get count for salons
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE location_id = 1";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$city_accra = $row['count'];
+
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE location_id = 2";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$city_kwabenya = $row['count'];
+
+$sql = "SELECT COUNT(*) AS count FROM business_details WHERE location_id = 3";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_assoc($result);
+$city_eastlegon = $row['count'];
+
+
+$dataLocation = array($city_accra, $city_kwabenya, $city_eastlegon);
+$data_location = json_encode($dataLocation);
+
+// Close the co"nnection
 mysqli_close($conn);
 
 ?>
@@ -389,126 +451,128 @@ mysqli_close($conn);
                             <div class="card">
 
                                 <div class="card-body">
-                                    <h5 class="card-title">Page Views <span>/Today</span></h5>
+                                    <h5 class="card-title">Categories Distribution <span>/Today</span></h5>
 
-                                    <!-- Line Chart -->
                                     <div id="reportsChart"></div>
-
                                     <script>
                                         document.addEventListener("DOMContentLoaded", () => {
                                             new ApexCharts(document.querySelector("#reportsChart"), {
                                                 series: [{
-                                                    name: 'Page Views',
-                                                    data: [31, 40, 28, 51, 42, 82, 56],
+                                                    name: 'Number of Businesses',
+                                                    data: <?php echo $data_json; ?>
                                                 }],
                                                 chart: {
                                                     height: 350,
-                                                    type: 'area',
+                                                    type: 'bar',
                                                     toolbar: {
                                                         show: false
                                                     },
                                                 },
-                                                markers: {
-                                                    size: 4
-                                                },
-                                                colors: ['#4154f1'],
-                                                fill: {
-                                                    type: "gradient",
-                                                    gradient: {
-                                                        shadeIntensity: 1,
-                                                        opacityFrom: 0.3,
-                                                        opacityTo: 0.4,
-                                                        stops: [0, 90, 100]
-                                                    }
+                                                plotOptions: {
+                                                    bar: {
+                                                        horizontal: false,
+                                                        columnWidth: '50%',
+                                                        endingShape: 'rounded'
+                                                    },
                                                 },
                                                 dataLabels: {
                                                     enabled: false
                                                 },
                                                 stroke: {
-                                                    curve: 'smooth',
-                                                    width: 2
+                                                    show: true,
+                                                    width: 2,
+                                                    colors: ['transparent']
                                                 },
                                                 xaxis: {
-                                                    type: 'datetime',
-                                                    categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
+                                                    categories: ['Hotels','Restaurants', 'Salons','Spas',  'Events'],
+                                                },
+                                                yaxis: {
+                                                    title: {
+                                                        text: 'Number of Businesses'
+                                                    }
+                                                },
+                                                fill: {
+                                                    opacity: 1
                                                 },
                                                 tooltip: {
-                                                    x: {
-                                                        format: 'dd/MM/yy HH:mm'
-                                                    },
+                                                    y: {
+                                                        formatter: function (val) {
+                                                            return val
+                                                        }
+                                                    }
                                                 }
                                             }).render();
                                         });
                                     </script>
-                                    <!-- End Line Chart -->
+
 
                                 </div>
 
                             </div>
                         </div><!-- End Reports -->
 
-                        <!-- Recent Sales -->
-                        <div class="col-12">
-                            <div class="card recent-sales overflow-auto">
-
-                                <div class="card-body">
-                                    <h5 class="card-title">Top Rated Businesses <span>| Today</span></h5>
-
-                                    <table class="table table-borderless datatable">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">Business</th>
-                                            <th scope="col">Category</th>
-                                            <th scope="col">Last Rated</th>
-                                            <th scope="col">Ratings <i class="bi bi-star"></i></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <th scope="row">#1</th>
-                                            <td>Golden Tulip</td>
-                                            <td>Hotel</td>
-                                            <td>2/02/2023</td>
-                                            <td>4.8 </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">#2</th>
-                                            <td>Kempinski</td>
-                                            <td>Hotel</td>
-                                            <td>1/02/2023</td>
-                                            <td>4.5 </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">#3</th>
-                                            <td>Bondai</td>
-                                            <td>Restaurant</td>
-                                            <td>2/02/2023</td>
-                                            <td>4.5 </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">#4</th>
-                                            <td>Twists & locs Salon</td>
-                                            <td>Salon</td>
-                                            <td>2/02/2023</td>
-                                            <td>4.2 </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">#5</th>
-                                            <td>Kora Spa</td>
-                                            <td>Spa</td>
-                                            <td>2/02/2023</td>
-                                            <td>4 </td>
-                                        </tr>
-
-                                        </tbody>
-                                    </table>
-
-                                </div>
-
-                            </div>
-                        </div><!-- End Recent Sales -->
-
+<!--                        <!-- Recent Sales -->-->
+<!--                        <div class="col-12">-->
+<!--                            <div class="card recent-sales overflow-auto">-->
+<!---->
+<!--                                <div class="card-body">-->
+<!--                                    <h5 class="card-title">Top Rated Businesses <span>| Today</span></h5>-->
+<!---->
+<!--                                    <table class="table table-borderless datatable">-->
+<!--                                        <thead>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="col">#</th>-->
+<!--                                            <th scope="col">Business</th>-->
+<!--                                            <th scope="col">Category</th>-->
+<!--                                            <th scope="col">Location</th>-->
+<!--                                            <th scope="col">Ratings <i class="bi bi-star"></i></th>-->
+<!--                                        </tr>-->
+<!--                                        </thead>-->
+<!--                                        <tbody>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="row">#1</th>-->
+<!--                                            <td>Golden Tulip</td>-->
+<!--                                            <td>Hotel</td>-->
+<!--                                            <td>2/02/2023</td>-->
+<!--                                            <td>4.8 </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="row">#2</th>-->
+<!--                                            <td>Kempinski</td>-->
+<!--                                            <td>Hotel</td>-->
+<!--                                            <td>1/02/2023</td>-->
+<!--                                            <td>4.5 </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="row">#3</th>-->
+<!--                                            <td>Bondai</td>-->
+<!--                                            <td>Restaurant</td>-->
+<!--                                            <td>2/02/2023</td>-->
+<!--                                            <td>4.5 </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="row">#4</th>-->
+<!--                                            <td>Twists & locs Salon</td>-->
+<!--                                            <td>Salon</td>-->
+<!--                                            <td>2/02/2023</td>-->
+<!--                                            <td>4.2 </td>-->
+<!--                                        </tr>-->
+<!--                                        <tr>-->
+<!--                                            <th scope="row">#5</th>-->
+<!--                                            <td>Kora Spa</td>-->
+<!--                                            <td>Spa</td>-->
+<!--                                            <td>2/02/2023</td>-->
+<!--                                            <td>4 </td>-->
+<!--                                        </tr>-->
+<!---->
+<!--                                        </tbody>-->
+<!--                                    </table>-->
+<!---->
+<!--                                </div>-->
+<!---->
+<!--                            </div>-->
+<!--                        </div><!-- End Recent Sales -->-->
+<!---->
 
 
                     </div>
@@ -576,41 +640,63 @@ mysqli_close($conn);
                     <div class="card">
 
                         <div class="card-body pb-0">
-                            <h5 class="card-title">User Feedback <span>| Today</span></h5>
+                            <h5 class="card-title">Location distribution </h5>
 
-                            <div class="news">
-                                <div class="post-item clearfix">
-                                    <img src="../assets/img/girl1.jpeg" alt="">
-                                    <h4><a href="#">Miriam Duke</a></h4>
-                                    <p>I love using your app, but I noticed that it crashes whenever I try to filter reviews by date. Could you please look into this issue? Thank you!"
-                                    </p>
-                                </div>
+                            <div id="locationsChart"></div>
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    new ApexCharts(document.querySelector("#locationsChart"), {
+                                        series: [{
+                                            name: 'Businesses',
+                                            data: <?php echo $data_location; ?>
+                                        }],
+                                        chart: {
+                                            height: 350,
+                                            type: 'bar',
+                                            toolbar: {
+                                                show: false
+                                            },
+                                        },
+                                        plotOptions: {
+                                            bar: {
+                                                horizontal: false,
+                                                columnWidth: '50%',
+                                                endingShape: 'rounded'
+                                            },
+                                        },
+                                        dataLabels: {
+                                            enabled: false
+                                        },
+                                        stroke: {
+                                            show: true,
+                                            width: 2,
+                                            colors: ['transparent']
+                                        },
+                                        xaxis: {
+                                            categories: ['Accra','Kwabenya', 'East legon'],
+                                        },
+                                        yaxis: {
+                                            title: {
+                                                text: 'Businesses'
+                                            }
+                                        },
+                                        fill: {
+                                            opacity: 1,
+                                            colors: ['#023020', '#FFC300', '#DAF7A6']
+                                        },
+                                        tooltip: {
+                                            y: {
+                                                formatter: function (val) {
+                                                    return val
+                                                }
+                                            }
+                                        }
+                                    }).render();
+                                });
+                            </script>
 
-                                <div class="post-item clearfix">
-                                    <img src="../assets/img/girl2.jpeg" alt="">
-                                    <h4><a href="#">Aiishaa Nuhu</a></h4>
-                                    <p>Your app is already great, but I think it would be even better if you could add a feature that allows users to save their favorite businesses. It would be really helpful. Thanks!</p>
-                                </div>
 
-                                <div class="post-item clearfix">
-                                    <img src="../assets/img/girl3.jpeg" alt="">
-                                    <h4><a href="#">Akua Boateng</a></h4>
-                                    <p>I really like the design and layout of your app. It's easy to use and navigate. However, I think it would be even better if you could make the font size a bit larger. Thanks for your hard work!</p>
-                                </div>
-
-                                <div class="post-item clearfix">
-                                    <img src="../assets/img/girl4.jpeg" alt="">
-                                    <h4><a href="#">Maame Frimpong</a></h4>
-                                    <p>I visited this restaurant based on the reviews on your app and I wasn't disappointed. The food was delicious and the service was excellent. Thank you for the recommendation!</p>
-                                </div>
-
-                                <div class="post-item clearfix">
-                                    <img src="../assets/img/guy1.jpeg" alt="">
-                                    <h4><a href="#">Deloris Kwabenya</a></h4>
-                                    <p>I noticed that the address for Golden Tulip is incorrect. It's actually located on the next street over can you please update the address information in your app? Thank you for your attention to this matter.</p>
-                                </div>
-
-                            </div><!-- End sidebar recent posts-->
+                            </div><!-- End feedback-->
 
                         </div>
                     </div><!-- End News & Updates -->

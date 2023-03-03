@@ -10,7 +10,39 @@ if(!(isset($_SESSION['user_id']))){
 else{
     $user_name = $_SESSION["user_name"];
     $nav_state = "Logout";
+
+    // Connect to the database
+    $servername = "localhost";
+    $username = "root";
+    $password = "password";
+    $dbname = "reeveew";
+    // Create a connection
+    $conn = mysqli_connect($servername, $username, $password, $dbname);
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+    $user_id = $_SESSION['user_id'];
+    $sql = "SELECT user_email FROM user_info WHERE user_id='$user_id'";
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        $u_email = $row['user_email'];
+    }
+    // Get image path
+    $sql = "SELECT image_path FROM Image WHERE user_email='$u_email'";
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $image_path = $row['image_path'];
     $state = 1;
+
+    $sql1="SELECT user_request.request_id,user_request.business_name, user_request.description, user_request.location,category.category_name,request_status.status_details 
+FROM user_request
+INNER JOIN category ON user_request.category_id = category.category_id
+INNER JOIN request_status ON user_request.status_id = request_status.status_id
+WHERE user_id='$user_id' ";
+
+    $result1 = mysqli_query($conn, $sql1);
 }
 ?>
 <!DOCTYPE html>
@@ -108,6 +140,7 @@ else{
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <img src="<?php echo $image_path?>" alt="" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">Hi <?php echo $user_name?></span>
                 </a><!-- End Profile Image Icon -->
 
@@ -179,86 +212,40 @@ else{
     <tr>
         <th scope="col">#</th>
         <th scope="col">Business Name</th>
+        <th scope="col">Description</th>
         <th scope="col">Category</th>
-        <th scope="col">Date requested</th>
+        <th scope="col">Location</th>
         <th scope="col">Status</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
-        <th scope="row">1</th>
-        <td>Transcorp Hilton</td>
-        <td>Hotel</td>
-        <td>2016-05-25</td>
-        <td>Pending</td>
-    </tr>
-    <tr>
-        <th scope="row">2</th>
-        <td>Cold Blues</td>
-        <td>Spa</td>
-        <td>2014-12-05</td>
-        <td style="color: green">Approved</td>
-    </tr>
-    <tr>
-        <th scope="row">3</th>
-        <td>Fish Grills</td>
-        <td>Restaurant</td>
-        <td>2011-08-12</td>
-        <td style="color: green">Approved</td>
-    </tr>
-    <tr>
-        <th scope="row">4</th>
-        <td>Andy's Massage House</td>
-        <td>Spa</td>
-        <td>2012-06-11</td>
-        <td style="color: red">Denied</td>
-    </tr>
-    <tr>
-        <th scope="row">5</th>
-        <td>KFC</td>
-        <td>Restaurant</td>
-        <td>2011-04-19</td>
-        <td style="color: green" >Approved</td>
-    </tr>
+    <?php
+    $counter=1;
+    while($row = mysqli_fetch_assoc($result1)) {
+    $business_name= $row['business_name'];
+    $description = $row['description'];
+    $category_name = $row['category_name'];
+    $status_details = $row['status_details'];
+    $location = $row['location'];
 
-    <tr>
-        <th scope="row">6</th>
-        <td>Chicken Republic</td>
-        <td>Restaurant</td>
-        <td>2011-04-19</td>
-        <td style="color: green" >Approved</td>
-    </tr>
-    <tr>
-        <th scope="row">7</th>
-        <td>Massage House</td>
-        <td>Spa</td>
-        <td>2012-06-11</td>
-        <td style="color: red">Denied</td>
-    </tr>
-    <tr>
-        <th scope="row">8</th>
-        <td>Maame's Salon ltd</td>
-        <td>Salon</td>
-        <td>2012-06-11</td>
-        <td style="color: red">Denied</td>
-    </tr>
-    <tr>
-        <th scope="row">9</th>
-        <td>Andy's Massage House</td>
-        <td>Spa</td>
-        <td>2012-06-11</td>
-        <td style="color: red">Denied</td>
-    </tr>
-    <tr>
-        <th scope="row">10</th>
-        <td>Hilton and sons</td>
-        <td>Hotel</td>
-        <td>2016-05-25</td>
-        <td>Pending</td>
-    </tr>
+
+    echo "<tr>";
+        echo "<td>".$counter."</td>";
+        echo "<td>".$business_name."</td>";
+        echo "<td>".$description."</td>";
+        echo "<td>".$category_name."</td>";
+        echo "<td>".$location."</td>";
+        echo "<td>".$status_details."</td>";
+        echo "</tr>";
+        $counter = $counter + 1;
+    }
+    ?>
+
     </tbody>
 </table>
-<!-- End Table with stripped rows -->
+<!-- End Table with stripped rows
+
+-->
 <button style="margin-left: 45%" class="btn btn-primary"><a style="color: white" href="user_request_form.php">New Request</a></button>
 <script>
     function isLogged(){

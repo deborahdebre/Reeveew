@@ -60,7 +60,7 @@ if (isset($_GET['exists'])) {
                         <!-- Logo -->
                         <div class="d-flex justify-content-center py-4">
                             <a href="index.html" class="logo d-flex align-items-center w-auto">
-                                <img src="assets/img/starlogo.png" alt="">
+                                <img src="../assets/img/starlogo.png" alt="">
                                 <span class="d-none d-lg-block">Reeveew</span>
                             </a>
                         </div><!-- End Logo -->
@@ -74,7 +74,7 @@ if (isset($_GET['exists'])) {
                                     <p class="text-center small">Enter your personal details to create account</p>
                                 </div>
                                 <!-- Create account form -->
-                                <form class="row g-3 needs-validation" action="process_registration.php" method="POST" onsubmit="return validateForm()">
+                                <form class="row g-3 needs-validation" action="process_registration.php" method="POST"  enctype="multipart/form-data" onsubmit="return validateForm()">
                                     <div class="col-12">
                                         <label for="fname" class="form-label">First Name</label>
                                         <input type="text" name="fname" class="form-control" id="fname" required>
@@ -113,8 +113,9 @@ if (isset($_GET['exists'])) {
                                         <label for="cpassword" class="form-label">Confirm password</label>
                                         <input type="password" name="cpassword" class="form-control" id="cpassword" required>
                                         <div class="invalid-feedback">Please confirm your password!</div>
-                                        <br>
                                     </div>
+                                    <label for="profile_pic">Upload Profile Picture</label>
+                                    <input type="file" name="profile_pic" id="profile_pic" required>
 
                                     <div class="col-12">
                                         <input class="btn btn-primary w-100" name="register" type="submit" value="Create Account">

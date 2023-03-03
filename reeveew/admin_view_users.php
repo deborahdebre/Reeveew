@@ -25,7 +25,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve all submitted business requests from the database
+// Retrieve all users from the database
 $sql = "SELECT * FROM user_info WHERE role_id=2";
 $result = mysqli_query($conn, $sql);
 
@@ -38,7 +38,7 @@ $result = mysqli_query($conn, $sql);
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Reeveew/Manage Requests</title>
+    <title>Reeveew/Manage Users</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -68,6 +68,42 @@ $result = mysqli_query($conn, $sql);
     * Author: BootstrapMade.com
     * License: https://bootstrapmade.com/license/
     ======================================================== -->
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%;
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    </style>
+
 
 </head>
 
@@ -83,18 +119,12 @@ $result = mysqli_query($conn, $sql);
         </a>
     </div><!-- End Logo -->
 
-
+    <input style="width: 600px;margin-left: 3%;padding-left: 20px" type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search Users...">
     <nav class="header-nav ms-auto">
         <ul class="d-flex align-items-center">
-            <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Search Users...">
-            <li class="nav-item d-block d-lg-none">
-                <a class="nav-link nav-icon search-bar-toggle " href="#">
-                    <i class="bi bi-search"></i>
-                </a>
-            </li><!-- End Search Icon-->
-
 
             <li class="nav-item dropdown pe-3">
+
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                     <span class="d-none d-md-block dropdown-toggle ps-2">Hello <?php echo $user_name; ?></span>
@@ -188,7 +218,50 @@ $result = mysqli_query($conn, $sql);
 <!-- Template Main JS File -->
 <script src="../assets/js/main.js"></script>
 
+<script>
+    function deleteUser(user_id) {
+        // send a request to update the request status
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "delete_user.php");
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                console.log(this.responseText);
+                // reload the page to see the updated requests
+                window.location.reload();
+            }
+        }
+        xhr.send("user_id=" + user_id);
+    }
+    function showProfile(id) {
+        // Get the modal popup
+        var modal = document.getElementById("profileModal");
 
+        // Get the close button element
+        var closeBtn = modal.querySelector(".close");
+
+        // Show the modal popup
+        modal.style.display = "block";
+
+        // Fetch the user profile using AJAX
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                // Display the user profile in the popup
+                var profileDetails = modal.querySelector("#profileDetails");
+                profileDetails.innerHTML = this.responseText;
+            }
+        };
+        xhttp.open("GET", "getProfile.php?user_id=" + id, true);
+        xhttp.send();
+
+        // Add a click event listener to the close button to hide the modal popup
+        closeBtn.addEventListener("click", function() {
+            modal.style.display = "none";
+        });
+    }
+
+</script>
 
 
 <div style="margin-top: 4%;" class="card">
@@ -198,13 +271,14 @@ $result = mysqli_query($conn, $sql);
 
     </div><!-- End Page Title -->
 
-    <table id="myTable" class="table table-hover">
+    <table style="margin-left: 13%;width: 900px" id="myTable" class="table table-hover">
         <thead>
         <tr>
             <th scope="col">#</th>
             <th scope="col">User</th>
             <th scope="col">Email</th>
             <th scope="col">Gender</th>
+            <th scope="col"></th>
             <th scope="col">Delete User</th>
         </tr>
         </thead>
@@ -226,7 +300,8 @@ $result = mysqli_query($conn, $sql);
             echo "<td>".$person_fname.' '.$person_lname."</td>";
             echo "<td>".$person_email."</td>";
             echo "<td>".$person_gender."</td>";
-            echo "<td><button style='margin-left: 12%' type='button' class='btn btn-danger' onclick=\"deleteUser($person_id)\"><i class='bi bi-trash'></i></button></td>";
+            echo "<td><button class='btn btn-link' onclick='showProfile(\"$person_id\")'>View Profile</button></td>";
+            echo "<td><button style='margin-left: 14%' type='button' class='btn btn-danger' onclick=\"deleteUser($person_id)\"><i class='bi bi-trash'></i></button></td>";
             echo "</tr>";
             $counter = $counter + 1;
         }
@@ -234,6 +309,15 @@ $result = mysqli_query($conn, $sql);
 
         </tbody>
     </table>
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h5 style="text-align: center" class="pagetitle">User Profile</h5>
+            <div id="profileDetails">
+                <!-- Profile details will be displayed here -->
+            </div>
+        </div>
+    </div>
 
 
 
@@ -268,23 +352,7 @@ $result = mysqli_query($conn, $sql);
         }
 
     </script>
-    <script>
-        function deleteUser(user_id) {
-            // send a request to update the request status
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "delete_user.php");
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {
-                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                    // reload the page to see the updated requests
-                    window.location.reload();
-                }
-            }
 
-            xhr.send("user_id=" + user_id);
-
-        }
-    </script>
 </body>
 
 </html>

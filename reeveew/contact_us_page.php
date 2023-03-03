@@ -7,8 +7,33 @@ if(!(isset($_SESSION['user_id']))){
 }
 else{
     $user_name = $_SESSION["user_name"];
+    $user_id = $_SESSION['user_id'];
     $nav_state = "Logout";
     $state =1;
+
+    // Connect to the database
+    $servername = "localhost";
+    $username = "root";
+    $password = "password";
+    $dbname = "reeveew";
+    // Create a connection
+    $conn = mysqli_connect($servername, $username, $password, $dbname);
+    // Check connection
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+    $sql = "SELECT user_email FROM user_info WHERE user_id='$user_id'";
+    $result = mysqli_query($conn, $sql);
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        $u_email = $row['user_email'];
+    }
+    // Get image path
+    $sql = "SELECT image_path FROM Image WHERE user_email='$u_email'";
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $image_path = $row['image_path'];
+
 }
 
 ?>
@@ -95,6 +120,7 @@ else{
             <li class="nav-item dropdown pe-3">
 
                 <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <img src="<?php echo $image_path?>" alt="" class="rounded-circle">
                     <span class="d-none d-md-block dropdown-toggle ps-2">Hi <?php echo $user_name?></span>
                 </a><!-- End Profile Image Icon -->
 
@@ -107,9 +133,9 @@ else{
                     </li>
 
                     <li>
-                        <a class="dropdown-item d-flex align-items-center" href="login_page.php">
+                        <a class="dropdown-item d-flex align-items-center" onclick="isLogged()">
                             <i class="bi bi-person"></i>
-                            <span>Login</span>
+                            <span><?php echo $nav_state?></span>
                         </a>
                     </li>
                     <li>
@@ -160,7 +186,7 @@ else{
 <!-- Template Main JS File -->
 <script src="../assets/js/main.js"></script>
 <!-- Default Card -->
-<div style="margin-top: 6%;margin-left: 25%" class="col-xl-6">
+<div style="margin-top: 10%;margin-left: 25%" class="col-xl-6">
     <div class="card">
         <div style="text-align: center;" class="card-body">
             <h5 style="text-align: center" class="card-title">Contact Us</h5>
@@ -177,23 +203,17 @@ else{
         </div>
         <br>
         <!-- Floating Labels Form -->
-        <form class="row g-3">
+        <form class="row g-3" method="post" action="submit_feedback.php">
+            <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']?>">
             <div style="margin-left: 17%" class="col-md-8">
                 <div class="form-floating">
-                    <input type="text" class="form-control" id="Title" placeholder="Title">
-                    <label for="Title">Title</label>
-                </div>
-            </div>
-
-            <div style="margin-left: 17%" class="col-md-8">
-                <div class="form-floating">
-                    <textarea class="form-control" placeholder="Feedback/Report" id="floatingTextarea" style="height: 100px;"></textarea>
+                    <textarea name="user_feedback" class="form-control" placeholder="Feedback/Report" id="floatingTextarea" style="height: 100px;"></textarea>
                     <label for="floatingTextarea">Feedback/Report</label>
                 </div>
             </div>
 
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit"  name="submit" class="btn btn-primary">Submit</button>
             </div>
 
         </form><!-- End floating Labels Form -->
